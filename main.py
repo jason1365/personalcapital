@@ -1,5 +1,7 @@
+from __future__ import print_function
 from personalcapital import PersonalCapital, RequireTwoFactorException, TwoFactorVerificationModeEnum
 import getpass
+import io
 import json
 import logging
 import os
@@ -59,7 +61,7 @@ def main():
     
     now = datetime.now()
     date_format = '%Y-%m-%d'
-    days = 90
+    days = 999
     start_date = (now - (timedelta(days=days+1))).strftime(date_format)
     end_date = (now - (timedelta(days=1))).strftime(date_format)
     transactions_response = pc.fetch('/transaction/getUserTransactions', {
@@ -78,6 +80,12 @@ def main():
 
     transactions = transactions_response.json()['spData']
     print('Number of transactions between {0} and {1}: {2}'.format(transactions['startDate'], transactions['endDate'], len(transactions['transactions'])))
+
+    with io.open('alldata.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(transactions_response.json(), indent=4, separators=(',', ': '), ensure_ascii=False))
+    
+    with io.open('transactions.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(transactions, indent=4, separators=(',', ': '), ensure_ascii=False))
 
 if __name__ == '__main__':
     main()
