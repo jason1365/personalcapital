@@ -9,10 +9,6 @@ def main():
 
     # Instantiates a client
     storage_client = storage.Client()
-
-    # print all existing buckets
-    #for bucket in storage_client.list_buckets():
-    #    print(bucket)
     
     # The name of the bucket
     bucket_name = 'richcompute'
@@ -25,11 +21,11 @@ def main():
     
     filename = 'data/transactions.json'
     
-    with io.open(filename) as upload_file:
-        blob = bucket.blob(filename)
-        blob.upload_from_string(upload_file.read(),content_type='application/json')
-     
-    print "The public URL is {}".format(blob.public_url)
+    blob = bucket.get_blob(filename)
+    json = blob.download_as_string()
+      
+    with open("data/downloaded.json", "w") as jsonfile:
+        print >> jsonfile, json
   
 if __name__ == '__main__':
     main()
