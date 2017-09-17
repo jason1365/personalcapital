@@ -61,7 +61,7 @@ def main():
     
     now = datetime.now()
     date_format = '%Y-%m-%d'
-    days = 999
+    days = 30
     start_date = (now - (timedelta(days=days+1))).strftime(date_format)
     end_date = (now - (timedelta(days=1))).strftime(date_format)
     transactions_response = pc.fetch('/transaction/getUserTransactions', {
