@@ -1,5 +1,6 @@
 from __future__ import print_function
 import httplib2
+import json
 import os
 
 from apiclient import discovery
@@ -49,6 +50,12 @@ def get_credentials():
     return credentials
 
 def main():
+    filename = 'data/transactions.json'
+
+    with open(filename) as json_file:
+        data = json.load(json_file)
+
+
     """Shows basic usage of the Sheets API.
 
     Creates a Sheets API service object and prints the names and majors of
@@ -63,21 +70,66 @@ def main():
                               discoveryServiceUrl=discoveryUrl)
 
     spreadsheetId = '1-7mEUS7tmeE6s_X3-WGDLLBc6U4TT0MH9zkk7AqEPL8'
-    rangeName = 'Automated Expenses!A3:C3'
-    #inputOption = ValueInputOption.RAW
+    rangeName = 'Automated Expenses'
     
-    values = [
-    [
-        30, 40, 50
-    ]
-    ]
+    values = [];
+    
+    """ A typical transaction, with reverse engineering comments
+    "transactions": [
+        {
+            "userTransactionId": 3457310036,                                Unique ID            
+            "cusipNumber": "",                                              ???
+            "isEditable": true,                                             Can the user update the transaction
+            "isCredit": false,                                              ???
+            "hasViewed": false,                                             ???
+            "transactionDate": "2017-05-28",                                Date
+            "memo": "",                                                     User associated data
+            "currency": "USD",                                              Currency 
+            "merchantId": "WZ8zZ8GmQF5jloIurEzsg5R29hOdRzWhi8EJiemomb0",    ???
+            "accountId": "5533673_8557423_14658696",                        Unique accountId ??
+            "isIncome": false,                                              True if income ?
+            "isNew": false,                                                 ???
+            "isInterest": false,                                            ???
+            "holdingType": "",                                              ???
+            "accountName": "Credit Card - Ending in 9970",                  Name of related account
+            "resultType": "aggregated",                                     ???
+            "isSpending": true,                                             True if an expense ?
+            "originalAmount": 14.6,                                         Amount of the expense
+            "userAccountId": 14658696,                                      ???
+            "price": 0.0,                                                   ???
+            "transactionType": "Debit",                                     ???
+            "merchant": "",                                                 ???
+            "description": "Amazon.com",                                    Transaction description
+            "symbol": "",                                                   ???
+            "lotHandling": "",                                              ???
+            "isCashOut": true,                                              Money was removed ?
+            "isCashIn": false,                                              Money was added?
+            "originalDescription": "Amazon.com",                            Transaction description (original?)
+            "status": "posted",                                             Not pending anymore if "posted"
+            "runningBalance": 0.0,                                          ???
+            "netCost": 0.0,                                                 ???
+            "checkNumber": "",                                              ???
+            "isCost": false,                                                ???
+            "categoryId": 13,                                               Related category id = getTransactionCategories
+            "amount": 14.6,                                                 Amount (same as originalAmount?)
+            "includeInCashManager": true,                                   ???
+            "simpleDescription": "Amazon.com",                              Yet another description
+            "isDuplicate": false                                            ???
+        },
+       // more entries
+    """
+    for entry in data["transactions"]:
+        aPrice = entry["originalAmount"]
+        aDate = entry["transactionDate"]
+        aDescription = entry["originalDescription"]
+        values.append([aDate, aPrice, aDescription])
     
     body = {
         'values': values
     }
     
-    result = service.spreadsheets().values().update(
-        spreadsheetId=spreadsheetId, range=rangeName, valueInputOption="RAW", body=body).execute()
+    result = service.spreadsheets().values().append(
+        spreadsheetId=spreadsheetId, range=rangeName, valueInputOption="USER_ENTERED", body=body).execute()
 
 if __name__ == '__main__':
     main()
