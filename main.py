@@ -75,8 +75,15 @@ def main():
     })
     pc.save_session()
 
+
+
+
+
     accounts = accounts_response.json()['spData']
     print('Networth: {0}'.format(accounts['networth']))
+    for i in accounts['accounts']:
+        if i['currentBalance'] > 0:
+            print((i['name']),'   ',i['currentBalance'])
 
     transactions = transactions_response.json()['spData']
     print('Number of transactions between {0} and {1}: {2}'.format(transactions['startDate'], transactions['endDate'], len(transactions['transactions'])))
@@ -86,6 +93,9 @@ def main():
     
     with io.open('transactions.json', 'w', encoding='utf-8') as f:
         f.write(json.dumps(transactions, indent=4, separators=(',', ': '), ensure_ascii=False))
+
+    with io.open('accounts_response.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(accounts, indent=4, separators=(',', ': '), ensure_ascii=False))
 
 if __name__ == '__main__':
     main()
